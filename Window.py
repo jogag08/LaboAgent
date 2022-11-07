@@ -19,7 +19,7 @@ class Window(QWidget):
             self.close()
 
     def initUi(self):
-        self.setWindowTitle("Dames")
+        self.setWindowTitle("Labo Agent")
         self.setGeometry(10,50,300,200) #grandeur de l'écran
 
         self.button = QPushButton("Bonjour",self)

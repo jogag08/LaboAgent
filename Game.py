@@ -1,42 +1,93 @@
 # This Python file uses the following encoding: utf-8
 import pygame
+import math
 
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton
 from PySide6.QtCore import QTimer
 from pygame import Surface
 
+from Agent import Agent
+from Line import Line
+
 class Game:
+    __agent:Agent
+    __line:Line
+    __mousePosition:int = [0,0]
+    __screenColor:int = [25,65,145]
+    __screenW:int = 800
+    __screenH:int = 800
     def __init__(self):
         pygame.init()
         self.timer = Timer()
         self.gameInit()
+        self.__agent = Agent(400, 400, 50, 0, "Idle", "hitman.png", self.__screenW, self.__screenH)
+        self.__line = Line([0,0,0], 0, 0, 0, 0, 1)
         self.shouldQuit = False
 
-
     def gameInit(self):
-        self.size = self.width, self.height = 800, 800
-        black = [0,0,0]
+        self.size = self.__screenW, self.__screenH
         self.screen = pygame.display.set_mode(self.size)
-        self.screen.fill(black)
+        self.screen.fill(self.__screenColor)
 
     def loop(self):
         self.timer.update()
         dt = self.timer.get_deltaTime
         self.processInput()
+        self.TEST()
         self.render()
         return self.shouldQuit
 
     def render(self):
+        self.__agent.renderAgent(self.screen)
+        self.__line.renderLine(self.screen)
         pygame.display.flip() #equivalent au render present dans SDL
 
     def processInput(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.shouldQuit = True
-            if event.type == pygame.MOUSEMOTION:
-                pass
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
+                self.onClick()
+
+    def setMousePosition(self):
+        self.__mousePosition = pygame.mouse.get_pos()
+
+    def setLine(self, x1, y1, x2, y2):
+        self.screen.fill(self.__screenColor)
+        agentMidX = int(x1 + (self.__agent.getSize() / 2))
+        agentMidY = int(y1 + (self.__agent.getSize() / 2))
+        self.__line.setX1(agentMidX)
+        self.__line.setY1(agentMidY)
+        self.__line.setX2(x2)
+        self.__line.setY2(y2)
+        self.__line.setColor([255,0,0])
+
+    def setAngle(self, x1, y1, x2, y2):
+        agentMidX = int(x1 + (self.__agent.getSize() / 2))
+        agentMidY = int(y1 + (self.__agent.getSize() / 2))
+        #agentOriginX =
+        #diffX = (x2 - agentMidX)
+        #diffY = (y2 - agentMidY)
+        #radAngle = math.atan(diffY / diffX)
+        #degAngle = int(radAngle * (180/math.pi))
+        #print("diffX:", diffX, "diffY", diffY)
+        ##print(degAngle)
+        #self.__agent.setDir(degAngle)
+
+
+
+
+    def onClick(self):
+        self.setMousePosition()
+        self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
+        self.setAngle(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
+
+
+
+    def TEST(self):
+        #print(self.__mousePosition)
+        pass
+
 
 class Timer:
     _clock = None
