@@ -28,7 +28,7 @@ class Agent:
         #cellRect = pygame.Rect(self.__x, self.__y, self.__size, self.__size)
         #pygame.draw.rect(screen, [255,255,255], cellRect)
 
-        screen.blit(rotatedImage, (self.__x, self.__y))
+        screen.blit(rotatedImage, (self.__, self.__y))
 
 
 

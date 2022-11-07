@@ -13,6 +13,7 @@ class Game:
     __agent:Agent
     __line:Line
     __mousePosition:int = [0,0]
+    __localMousePosition:int = [0,0]
     __screenColor:int = [25,65,145]
     __screenW:int = 800
     __screenH:int = 800
@@ -52,6 +53,11 @@ class Game:
     def setMousePosition(self):
         self.__mousePosition = pygame.mouse.get_pos()
 
+    def setLocalMousePosition(self, mp0, mp1):
+        self.__localMousePosition[0] = int(mp0 - (self.__screenW / 2))
+        self.__localMousePosition[1] = int((mp1 * -1) + (self.__screenH / 2))
+
+
     def setLine(self, x1, y1, x2, y2):
         self.screen.fill(self.__screenColor)
         agentMidX = int(x1 + (self.__agent.getSize() / 2))
@@ -63,24 +69,36 @@ class Game:
         self.__line.setColor([255,0,0])
 
     def setAngle(self, x1, y1, x2, y2):
-        agentMidX = int(x1 + (self.__agent.getSize() / 2))
-        agentMidY = int(y1 + (self.__agent.getSize() / 2))
-        #agentOriginX =
-        #diffX = (x2 - agentMidX)
-        #diffY = (y2 - agentMidY)
-        #radAngle = math.atan(diffY / diffX)
-        #degAngle = int(radAngle * (180/math.pi))
+        agentMidX = int(x1)  #agentMidX = int(x1 + (self.__agent.getSize() / 2))
+        agentMidY = int(y1)  #agentMidY = int(y1 + (self.__agent.getSize() / 2))
+        diffX = (x2 - agentMidX)
+        diffY = (y2 - agentMidY)
+        radAngle = math.atan(diffY / diffX)
+        degAngle = int(radAngle * (180/math.pi))
+        self.setAngleIn360(degAngle)
         #print("diffX:", diffX, "diffY", diffY)
-        ##print(degAngle)
+        #print(degAngle)
         #self.__agent.setDir(degAngle)
 
+    def setAngleIn360(self, degAngle):
+        if (self.__localMousePosition[0] >= 0 and self.__localMousePosition[1] >= 0): #QUADRAN 1
+            pass
+        if (self.__localMousePosition[0] >= 0 and self.__localMousePosition[1] <= 0): #QUADRAN 2
+            pass
+        if (self.__localMousePosition[0] <= 0 and self.__localMousePosition[1] <= 0): #QUADRAN 3
+            degAngle -= 180
+        if (self.__localMousePosition[0] < 0 and self.__localMousePosition[1] >= 0): #QUADRAN 4
+            degAngle += 180
+        #print(degAngle)
+        self.__agent.setDir(degAngle)
 
 
 
     def onClick(self):
         self.setMousePosition()
+        self.setLocalMousePosition(self.__mousePosition[0], self.__mousePosition[1])
         self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
-        self.setAngle(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
+        self.setAngle(self.__agent.getLocalX(), self.__agent.getLocalY(), self.__localMousePosition[0], self.__localMousePosition[1])
 
 
 
