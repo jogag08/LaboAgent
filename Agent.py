@@ -8,8 +8,8 @@ from pygame import Surface
 class Agent:
     __x:int
     __y:int
-    __lx:int
-    __ly:int
+    __bx:int
+    __by:int
     __dir:int
     __size:int
     __state:str
@@ -18,8 +18,8 @@ class Agent:
         self.setSize(size)
         self.setX(x)
         self.setY(y)
-        self.setLocalX(x, screenW)
-        self.setLocalY(y, screenH)
+        self.setBoardX(x, screenW)
+        self.setBoardY(y, screenH)
         self.setDir(dir)
         self.setState(state)
         self.setImage(img)
@@ -42,10 +42,10 @@ class Agent:
         return self.__x
 
 
-    def setLocalX(self, x, screenW):
+    def setBoardX(self, x, screenW):
         self.__lx = int(x - (screenW / 2))
 
-    def getLocalX(self):
+    def getBoardX(self):
         return self.__lx
 
 
@@ -58,10 +58,10 @@ class Agent:
 
 
 
-    def setLocalY(self, y, screenH):
+    def setBoardY(self, y, screenH):
         self.__ly = int((y * -1) + (screenH / 2))
 
-    def getLocalY(self):
+    def getBoardY(self):
         return self.__ly
 
 

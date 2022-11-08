@@ -15,6 +15,7 @@ class Game:
     __line:Line
     __mousePosition:int = [400,400]
     __boardMousePosition:int = [0,0]
+    __agentBoardMousePosition:int = [0,0]
     __screenColor:int = [25,65,145]
     __screenW:int = 800
     __screenH:int = 800
@@ -57,11 +58,16 @@ class Game:
     def setMousePosition(self):
         self.__mousePosition = pygame.mouse.get_pos()
 
-    def setLocalMousePosition(self, mp0, mp1):
-        self.__localMousePosition[0] = int(mp0 - (self.__screenW / 2))
-        self.__localMousePosition[1] = int((mp1 * -1) + (self.__screenH / 2))
+    def setBoardMousePosition(self, mp0, mp1):
+        self.__boardMousePosition[0] = int(mp0 - (self.__screenW / 2))
+        self.__boardMousePosition[1] = int((mp1 * -1) + (self.__screenH / 2))
+
+    def setLocalBoardMousePosition(self):
+        self.__agentBoardMousePosition[0] = 0
+        self.__agentBoardMousePosition[1] = 0
 
 
+        #Le setline utilise les positions 0 à 800 de ma window
     def setLine(self, x1, y1, x2, y2):
         self.screen.fill(self.__screenColor)
         self.__line.setX1(x1)
@@ -70,6 +76,7 @@ class Game:
         self.__line.setY2(y2)
         self.__line.setColor([255,0,0])
 
+        #L'angle de l'agent est calculée avec les positions de la board mais devrait être calculée selon la position locale de l'agent
     def setAngle(self, x1, y1, x2, y2):
         diffX = (x2 - x1)
         diffY = (y2 - x1)
@@ -79,13 +86,13 @@ class Game:
         self.setAngleIn360(degAngle)
 
     def setAngleIn360(self, degAngle):
-        if (self.__localMousePosition[0] > 0 and self.__localMousePosition[1] > 0): #QUADRAN 1
+        if (self.__boardMousePosition[0] > 0 and self.__boardMousePosition[1] > 0): #QUADRAN 1
             pass
-        if (self.__localMousePosition[0] > 0 and self.__localMousePosition[1] < 0): #QUADRAN 2
+        if (self.__boardMousePosition[0] > 0 and self.__boardMousePosition[1] < 0): #QUADRAN 2
             degAngle += 360
-        if (self.__localMousePosition[0] < 0 and self.__localMousePosition[1] < 0): #QUADRAN 3
+        if (self.__boardMousePosition[0] < 0 and self.__boardMousePosition[1] < 0): #QUADRAN 3
             degAngle += 180
-        if (self.__localMousePosition[0] < 0 and self.__localMousePosition[1] > 0): #QUADRAN 4
+        if (self.__boardMousePosition[0] < 0 and self.__boardMousePosition[1] > 0): #QUADRAN 4
             degAngle += 180
         if (degAngle == -0.0):
             degAngle = 180.0
@@ -115,10 +122,10 @@ class Game:
 
     def onClick(self):
         self.setMousePosition()
-        self.setLocalMousePosition(self.__mousePosition[0], self.__mousePosition[1])
+        self.setBoardMousePosition(self.__mousePosition[0], self.__mousePosition[1])
         if(self.getCbox() == "Seek"):
             self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
-            self.setAngle(self.__agent.getLocalX(), self.__agent.getLocalY(), self.__localMousePosition[0], self.__localMousePosition[1])
+            self.setAngle(self.__agent.getBoardX(), self.__agent.getBoardY(), self.__boardMousePosition[0], self.__boardMousePosition[1])
             #self.onSeek(self.__agent.getLocalX(), self.__agent.getLocalY(), self.__localMousePosition[0], self.__localMousePosition[1])
 
 
@@ -130,7 +137,7 @@ class Game:
 
     def TEST(self):
         #print(self.__mousePosition)
-        #print(self.__agent.getLocalX(), self.__agent.getLocalY())
+        print(self.__agent.getBoardX(), self.__agent.getBoardY())
         pass
 
 
