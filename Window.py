@@ -1,11 +1,14 @@
 # This Python file uses the following encoding: utf-8
-from Game import Game
-from PySide6.QtWidgets import QWidget, QPushButton
+from PySide6.QtWidgets import QWidget, QPushButton, QComboBox
 from PySide6.QtCore import QTimer
+
+from Game import Game
 
 class Window(QWidget):
     timer:QTimer #timer qui s'occupe d'appeler le pygameLoop
     game:Game        #référence vers l'instance Game, la mémoire n'est pas allouée encore
+    comboBox:QComboBox
+    state:str
     def __init__(self, game:Game):  #à la création de la window, l'instance de la game est passée en param
         super().__init__()
         self.timer = QTimer()
@@ -21,12 +24,27 @@ class Window(QWidget):
     def initUi(self):
         self.setWindowTitle("Labo Agent")
         self.setGeometry(10,50,300,200) #grandeur de l'écran
-
-        self.button = QPushButton("Bonjour",self)
-        #self.button.setToolTip("Don't you dare !")
-        self.button.move(100,70)
-        self.button.clicked.connect(self.onClick)
+        self.comboBox = QComboBox(self)
+        self.comboBox.addItems(["Seek","Flee", "Wander"])
+        self.comboBox.move(100,70)
+        self.comboBox.currentIndexChanged.connect(self.onStateChange)
         self.show()
 
-    def onClick(self):
-        print('ca clique')
+    def onStateChange(self):
+        comboBox:QComboBox = self.sender()
+        self.game.setCbox(comboBox.currentText())
+
+    def setChosenState(self, state):
+        self.state = state
+
+    def getChosenState(self):
+        return self.state
+
+    def onClickSeek(self):
+        self.setChosenState("Seek")
+
+    def onClickFlee(self):
+        self.setChosenState("Flee")
+
+    def onClickWander(self):
+        self.setChosenState("Wander")

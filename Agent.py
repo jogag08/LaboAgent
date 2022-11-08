@@ -1,5 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
+#SOURCE : https://www.youtube.com/watch?v=_TU6BEyBieE J'ai utilisé ce vidéo pour bien faire rotate l'agent
+
 import pygame
 from pygame import Surface
 
@@ -22,13 +24,13 @@ class Agent:
         self.setState(state)
         self.setImage(img)
 
-    def renderAgent(self, screen:Surface):
+    def renderAgent(self, screen:Surface, mp0, mp1):
         resizedImage = pygame.transform.scale(self.__img, (self.__size, self.__size))
         rotatedImage = pygame.transform.rotate(resizedImage, self.__dir)
         #cellRect = pygame.Rect(self.__x, self.__y, self.__size, self.__size)
         #pygame.draw.rect(screen, [255,255,255], cellRect)
-
-        screen.blit(rotatedImage, (self.__, self.__y))
+        #screen.blit(rotatedImage, (self.__x, self.__y))
+        screen.blit(rotatedImage, (self.__x - int(rotatedImage.get_width() / 2), self.__y - int(rotatedImage.get_height() / 2)))
 
 
 

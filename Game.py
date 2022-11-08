@@ -9,19 +9,21 @@ from pygame import Surface
 from Agent import Agent
 from Line import Line
 
+
 class Game:
     __agent:Agent
     __line:Line
-    __mousePosition:int = [0,0]
+    __mousePosition:int = [400,400]
     __localMousePosition:int = [0,0]
     __screenColor:int = [25,65,145]
     __screenW:int = 800
     __screenH:int = 800
+    __cbox:str
     def __init__(self):
         pygame.init()
         self.timer = Timer()
         self.gameInit()
-        self.__agent = Agent(400, 400, 50, 0, "Idle", "hitman.png", self.__screenW, self.__screenH)
+        self.__agent = Agent(400, 400, 50, 0, "Seek", "hitman.png", self.__screenW, self.__screenH)
         self.__line = Line([0,0,0], 0, 0, 0, 0, 1)
         self.shouldQuit = False
 
@@ -39,7 +41,7 @@ class Game:
         return self.shouldQuit
 
     def render(self):
-        self.__agent.renderAgent(self.screen)
+        self.__agent.renderAgent(self.screen, self.__mousePosition[0], self.__mousePosition[1])
         self.__line.renderLine(self.screen)
         pygame.display.flip() #equivalent au render present dans SDL
 
@@ -49,6 +51,8 @@ class Game:
                 self.shouldQuit = True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.onClick()
+            #if event.type == pygame.MOUSEMOTION:
+            #    self.onClick()
 
     def setMousePosition(self):
         self.__mousePosition = pygame.mouse.get_pos()
@@ -60,45 +64,55 @@ class Game:
 
     def setLine(self, x1, y1, x2, y2):
         self.screen.fill(self.__screenColor)
-        agentMidX = int(x1 + (self.__agent.getSize() / 2))
-        agentMidY = int(y1 + (self.__agent.getSize() / 2))
-        self.__line.setX1(agentMidX)
-        self.__line.setY1(agentMidY)
+        self.__line.setX1(x1)
+        self.__line.setY1(y1)
         self.__line.setX2(x2)
         self.__line.setY2(y2)
         self.__line.setColor([255,0,0])
 
     def setAngle(self, x1, y1, x2, y2):
-        agentMidX = int(x1)  #agentMidX = int(x1 + (self.__agent.getSize() / 2))
-        agentMidY = int(y1)  #agentMidY = int(y1 + (self.__agent.getSize() / 2))
-        diffX = (x2 - agentMidX)
-        diffY = (y2 - agentMidY)
-        radAngle = math.atan(diffY / diffX)
-        degAngle = int(radAngle * (180/math.pi))
-        self.setAngleIn360(degAngle)
-        #print("diffX:", diffX, "diffY", diffY)
-        #print(degAngle)
-        #self.__agent.setDir(degAngle)
+        diffX = (x2 - x1)
+        diffY = (y2 - x1)
+        if(diffY != 0 and diffX != 0):
+            radAngle = math.atan(diffY / diffX)
+            degAngle = int(radAngle * (180/math.pi))
+            self.setAngleIn360(degAngle)
 
     def setAngleIn360(self, degAngle):
-        if (self.__localMousePosition[0] >= 0 and self.__localMousePosition[1] >= 0): #QUADRAN 1
+        if (self.__localMousePosition[0] > 0 and self.__localMousePosition[1] > 0): #QUADRAN 1
             pass
-        if (self.__localMousePosition[0] >= 0 and self.__localMousePosition[1] <= 0): #QUADRAN 2
-            pass
-        if (self.__localMousePosition[0] <= 0 and self.__localMousePosition[1] <= 0): #QUADRAN 3
-            degAngle -= 180
-        if (self.__localMousePosition[0] < 0 and self.__localMousePosition[1] >= 0): #QUADRAN 4
+        if (self.__localMousePosition[0] > 0 and self.__localMousePosition[1] < 0): #QUADRAN 2
+            degAngle += 360
+        if (self.__localMousePosition[0] < 0 and self.__localMousePosition[1] < 0): #QUADRAN 3
             degAngle += 180
-        #print(degAngle)
+        if (self.__localMousePosition[0] < 0 and self.__localMousePosition[1] > 0): #QUADRAN 4
+            degAngle += 180
+        if (degAngle == -0.0):
+            degAngle = 180.0
         self.__agent.setDir(degAngle)
 
+    def setCbox(self, currState):
+        self.__cbox = currState
 
+    def getCbox(self):
+        return self.__cbox
+
+    def onSeek(self, lmp, posAgent):
+        velo = self.__localMousePosition - posAgent
+        math.clamp()
 
     def onClick(self):
         self.setMousePosition()
         self.setLocalMousePosition(self.__mousePosition[0], self.__mousePosition[1])
-        self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
-        self.setAngle(self.__agent.getLocalX(), self.__agent.getLocalY(), self.__localMousePosition[0], self.__localMousePosition[1])
+        if(self.getCbox() == "Seek"):
+            self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
+            self.setAngle(self.__agent.getLocalX(), self.__agent.getLocalY(), self.__localMousePosition[0], self.__localMousePosition[1])
+
+        if(self.getCbox() == "Flee"):
+            pass
+
+        if(self.getCbox() == "Wander"):
+            pass
 
 
 
