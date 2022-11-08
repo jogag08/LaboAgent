@@ -34,6 +34,7 @@ class Window(QWidget):
         comboBox:QComboBox = self.sender()
         self.game.setCbox(comboBox.currentText())
 
+
     def setChosenState(self, state):
         self.state = state
 

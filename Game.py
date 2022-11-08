@@ -14,11 +14,11 @@ class Game:
     __agent:Agent
     __line:Line
     __mousePosition:int = [400,400]
-    __localMousePosition:int = [0,0]
+    __boardMousePosition:int = [0,0]
     __screenColor:int = [25,65,145]
     __screenW:int = 800
     __screenH:int = 800
-    __cbox:str
+    __cbox:str = "Seek"
     def __init__(self):
         pygame.init()
         self.timer = Timer()
@@ -51,8 +51,8 @@ class Game:
                 self.shouldQuit = True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.onClick()
-            #if event.type == pygame.MOUSEMOTION:
-            #    self.onClick()
+            if event.type == pygame.MOUSEMOTION:
+                self.onClick()
 
     def setMousePosition(self):
         self.__mousePosition = pygame.mouse.get_pos()
@@ -73,10 +73,10 @@ class Game:
     def setAngle(self, x1, y1, x2, y2):
         diffX = (x2 - x1)
         diffY = (y2 - x1)
-        if(diffY != 0 and diffX != 0):
-            radAngle = math.atan(diffY / diffX)
-            degAngle = int(radAngle * (180/math.pi))
-            self.setAngleIn360(degAngle)
+        #if(diffY != 0 and diffX != 0):
+        radAngle = math.atan(diffY / diffX)
+        degAngle = radAngle * (180/math.pi)
+        self.setAngleIn360(degAngle)
 
     def setAngleIn360(self, degAngle):
         if (self.__localMousePosition[0] > 0 and self.__localMousePosition[1] > 0): #QUADRAN 1
@@ -89,6 +89,7 @@ class Game:
             degAngle += 180
         if (degAngle == -0.0):
             degAngle = 180.0
+        #print(degAngle)
         self.__agent.setDir(degAngle)
 
     def setCbox(self, currState):
@@ -97,9 +98,20 @@ class Game:
     def getCbox(self):
         return self.__cbox
 
-    def onSeek(self, lmp, posAgent):
-        velo = self.__localMousePosition - posAgent
-        math.clamp()
+    def onSeek(self, x1, y1, x2, y2):
+        pass
+        #dist:int = [0,0]
+        #dist[0] = x2 - x1
+        #dist[1] = y2 - y1
+        #vecLen = pygame.math.Vector2(dist).length()
+        #vecLenNorm = pygame.math.Vector2(vecLen).normalize()
+        #print(dist)
+        #self.__agent.seekMove(vecLenNorm[0], self.__screenW, self.__screenH)
+        #print(dist)
+        #print(vecLen)
+        #print(vecLenNorm[0])
+        #velo = self.__localMousePosition - posAgent
+        #math.clamp()
 
     def onClick(self):
         self.setMousePosition()
@@ -107,6 +119,8 @@ class Game:
         if(self.getCbox() == "Seek"):
             self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
             self.setAngle(self.__agent.getLocalX(), self.__agent.getLocalY(), self.__localMousePosition[0], self.__localMousePosition[1])
+            #self.onSeek(self.__agent.getLocalX(), self.__agent.getLocalY(), self.__localMousePosition[0], self.__localMousePosition[1])
+
 
         if(self.getCbox() == "Flee"):
             pass
@@ -114,10 +128,9 @@ class Game:
         if(self.getCbox() == "Wander"):
             pass
 
-
-
     def TEST(self):
         #print(self.__mousePosition)
+        #print(self.__agent.getLocalX(), self.__agent.getLocalY())
         pass
 
 

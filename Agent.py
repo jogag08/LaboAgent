@@ -89,6 +89,15 @@ class Agent:
         return self.__state;
 
 
-
     def setImage(self, path:str):
         self.__img = pygame.image.load(path)
+
+    def seekMove(self, velocity, screenW, screenH):
+        self.setX(self.getX() + velocity)
+        self.setY(self.getY() + velocity)
+        #self.setLocalX(self.getX(), screenW)
+        #self.setLocalY(self.getY(), screenH)
+        pass
+
+
+
