@@ -43,10 +43,10 @@ class Agent:
 
 
     def setBoardX(self, x, screenW):
-        self.__lx = int(x - (screenW / 2))
+        self.__bx = int(x - (screenW / 2))
 
     def getBoardX(self):
-        return self.__lx
+        return self.__bx
 
 
 
@@ -59,10 +59,10 @@ class Agent:
 
 
     def setBoardY(self, y, screenH):
-        self.__ly = int((y * -1) + (screenH / 2))
+        self.__by = int((y * -1) + (screenH / 2))
 
     def getBoardY(self):
-        return self.__ly
+        return self.__by
 
 
 
@@ -92,11 +92,11 @@ class Agent:
     def setImage(self, path:str):
         self.__img = pygame.image.load(path)
 
-    def seekMove(self, velocity, screenW, screenH):
-        self.setX(self.getX() + velocity)
-        self.setY(self.getY() + velocity)
-        #self.setLocalX(self.getX(), screenW)
-        #self.setLocalY(self.getY(), screenH)
+    def seekMove(self, dir, screenW, screenH):
+        self.setX(self.getX() + dir)
+        self.setY(self.getY() + dir)
+        self.setBoardX(self.getX(), screenW)
+        self.setBoardY(self.getY(), screenH)
         pass
 
 
