@@ -11,6 +11,7 @@ class Agent:
     __bx:int
     __by:int
     __dir:int
+    __speed:int = 400
     __size:int
     __state:str
     __img:str
@@ -31,6 +32,7 @@ class Agent:
         #pygame.draw.rect(screen, [255,255,255], cellRect)
         #screen.blit(rotatedImage, (self.__x, self.__y))
         screen.blit(rotatedImage, (self.__x - int(rotatedImage.get_width() / 2), self.__y - int(rotatedImage.get_height() / 2)))
+        #print(self.__bx, self.__by)
 
 
 
@@ -40,6 +42,7 @@ class Agent:
 
     def getX(self):
         return self.__x
+
 
 
     def setBoardX(self, x, screenW):
@@ -88,15 +91,26 @@ class Agent:
     def getState(self):
         return self.__state;
 
+    def setSpeed(self, speed):
+        self.__speed = speed
+
+    def getSpeed(self):
+        return self.__speed
+
 
     def setImage(self, path:str):
         self.__img = pygame.image.load(path)
 
-    def seekMove(self, dir, screenW, screenH):
-        self.setX(self.getX() + dir)
-        self.setY(self.getY() + dir)
+    def seekMove(self, dir, screenW, screenH, dt):
+        #print(dir)
+        dir.y = -dir.y
+        vecPos = pygame.math.Vector2((self.getX(), self.getY()))
+        vecPos += dir * self.getSpeed() * dt
+        self.setX(vecPos.x)
+        self.setY(vecPos.y)
         self.setBoardX(self.getX(), screenW)
         self.setBoardY(self.getY(), screenH)
+        #print(self.getX(), self.getY())
         pass
 
 

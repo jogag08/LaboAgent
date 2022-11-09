@@ -6,11 +6,13 @@ from PySide6.QtWidgets import QApplication, QWidget, QPushButton
 from PySide6.QtCore import QTimer
 from pygame import Surface
 
+from Timer import Timer
 from Agent import Agent
 from Line import Line
 
 
 class Game:
+    __timer:Timer = Timer()
     __agent:Agent
     __line:Line
     __mousePosition:int = [400,400]
@@ -35,8 +37,8 @@ class Game:
         self.screen.fill(self.__screenColor)
 
     def loop(self):
-        self.timer.update()
-        dt = self.timer.get_deltaTime
+        self.__timer.update()
+        #dt = self.__timer.get_deltaTime
         self.processInput()
         self.TEST()
         self.render()
@@ -121,10 +123,10 @@ class Game:
         dist[1] = y2 - y1
         vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
         vecDirNorm = pygame.math.Vector2(vecDir).normalize()
+        self.__agent.seekMove(vecDirNorm, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
         #print(dist)
-        self.__agent.seekMove(vecDirNorm, self.__screenW, self.__screenH)
         #print(vecLen)
-        print(vecDirNorm[0])
+        #print(vecDirNorm[0])
         #velo = self.__localMousePosition - posAgent
         #math.clamp()
 
@@ -151,17 +153,3 @@ class Game:
         #self.setDistanceAgentFromOrigin()
         #self.setLocalBoardMousePosition()
         pass
-
-
-class Timer:
-    _clock = None
-    _dt:float = 0.016
-
-    def __init__(self):
-        self._clock = pygame.time.Clock()
-
-    def update(self):
-        self._dt = self._clock.tick(60)/1000
-
-    def get_deltaTime(self):
-        return self._dt
