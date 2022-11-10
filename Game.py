@@ -85,7 +85,6 @@ class Game:
         self.__line.setY2(y2)
         self.__line.setColor([255,0,0])
 
-        #L'angle de l'agent est calculée avec les positions de la board mais devrait être calculée selon la position locale de l'agent
     def setAngle(self, x1, y1, x2, y2):
         diffX = (x2 - x1)
         diffY = (y2 - x1)
@@ -106,6 +105,7 @@ class Game:
         if (degAngle == -0.0):
             degAngle = 180.0
         self.__agent.setDir(degAngle)
+        #print(degAngle)
 
     def setCbox(self, currState):
         self.__cbox = currState
