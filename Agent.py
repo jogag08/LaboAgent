@@ -11,10 +11,14 @@ class Agent:
     __bx:int
     __by:int
     __dir:int
-    __speed:int = 400
+    __maxSpeed:int = 100
+    __minSpeed:int = 100
     __size:int
     __state:str
     __img:str
+    __velocity:pygame.math.Vector2 = pygame.math.Vector2((0,0))
+    __accel:int = 5
+    __decel:int = 5
     def __init__(self, x, y, size, dir, state, img, screenW, screenH):
         self.setSize(size)
         self.setX(x)
@@ -91,27 +95,38 @@ class Agent:
     def getState(self):
         return self.__state;
 
-    def setSpeed(self, speed):
-        self.__speed = speed
+    def setMaxSpeed(self, speed):
+        self.__maxSpeed = speed
 
-    def getSpeed(self):
-        return self.__speed
+    def getMaxSpeed(self):
+        return self.__maxSpeed
 
+    def setMinSpeed(self, speed):
+        self.__minSpeed = speed
+
+    def getMinSpeed(self):
+        return self.__minSpeed
 
     def setImage(self, path:str):
         self.__img = pygame.image.load(path)
 
-    def seekMove(self, dir, screenW, screenH, dt):
+    def seekMove(self, dist, dir, screenW, screenH, dt):
         #print(dir)
         dir.y = -dir.y
         vecPos = pygame.math.Vector2((self.getX(), self.getY()))
-        vecPos += dir * self.getSpeed() * dt
+        #vecPos += dir * self.getSpeed() * dt
+        self.__velocity += dir * self.__accel * dt
+        vecPos += self.__velocity
         self.setX(vecPos.x)
         self.setY(vecPos.y)
         self.setBoardX(self.getX(), screenW)
         self.setBoardY(self.getY(), screenH)
         #print(self.getX(), self.getY())
         pass
+
+    def Lerp(self, dist, velo, maxSpeed, minSpeed):
+        pass
+
 
 
 

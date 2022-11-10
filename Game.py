@@ -23,6 +23,7 @@ class Game:
     __screenW:int = 800
     __screenH:int = 800
     __cbox:str = "Seek"
+    __vecLen:float
     def __init__(self):
         pygame.init()
         self.timer = Timer()
@@ -38,7 +39,7 @@ class Game:
 
     def loop(self):
         self.__timer.update()
-        #dt = self.__timer.get_deltaTime
+        self.agentMove()
         self.processInput()
         self.TEST()
         self.render()
@@ -68,15 +69,11 @@ class Game:
     def setDistanceAgentFromOrigin(self):
         self.__distAgentFromOrigin[0] = self.__agent.getBoardX()
         self.__distAgentFromOrigin[1] = self.__agent.getBoardY()
-        #print(self.__agent.getX())
-        #print(self.__agent.getBoardX())
-        #print(self.__distAgentFromOrigin[0], self.__distAgentFromOrigin[1])
 
 
     def setLocalBoardMousePosition(self):
         self.__localBoardMousePosition[0] = self.__boardMousePosition[0] - self.__distAgentFromOrigin[0]
         self.__localBoardMousePosition[1] = self.__boardMousePosition[1] - self.__distAgentFromOrigin[1]
-        #print(self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
 
 
         #Le setline utilise les positions 0 à 800 de ma window
@@ -108,7 +105,6 @@ class Game:
             degAngle += 180
         if (degAngle == -0.0):
             degAngle = 180.0
-        #print(degAngle)
         self.__agent.setDir(degAngle)
 
     def setCbox(self, currState):
@@ -123,29 +119,35 @@ class Game:
         dist[1] = y2 - y1
         vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
         vecDirNorm = pygame.math.Vector2(vecDir).normalize()
-        self.__agent.seekMove(vecDirNorm, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
-        #print(dist)
-        #print(vecLen)
-        #print(vecDirNorm[0])
-        #velo = self.__localMousePosition - posAgent
-        #math.clamp()
+        self.__agent.seekMove(vecDir.length(), vecDirNorm, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
 
     def onClick(self):
         self.setMousePosition()
         self.setBoardMousePosition(self.__mousePosition[0], self.__mousePosition[1])
         self.setDistanceAgentFromOrigin()
         self.setLocalBoardMousePosition()
-        if(self.getCbox() == "Seek"):
-            self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
-            self.setAngle(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
-            self.onSeek(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
+
+    def agentMove(self):
+        self.setVecLen(self.__agent.getBoardX(), self.__agent.getBoardY(), self.__boardMousePosition[0], self.__boardMousePosition[1])
+        if (self.__boardMousePosition[0] != 0) and (self.__boardMousePosition[1] != 0) and self.__vecLen > 1:
+            if(self.getCbox() == "Seek"):
+                self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
+                self.setAngle(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
+                self.onSeek(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
+
+            if(self.getCbox() == "Flee"):
+                pass
+
+            if(self.getCbox() == "Wander"):
+                pass
+
+    def setVecLen(self, x1, y1, x2, y2):
+        dist:int = [0,0]
+        dist[0] = x2 - x1
+        dist[1] = y2 - y1
+        self.__vecLen = int(pygame.math.Vector2(dist).length())
 
 
-        if(self.getCbox() == "Flee"):
-            pass
-
-        if(self.getCbox() == "Wander"):
-            pass
 
     def TEST(self):
         #print(self.__mousePosition)
