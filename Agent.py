@@ -19,6 +19,7 @@ class Agent:
     __velocity:pygame.math.Vector2 = pygame.math.Vector2((0,0))
     __accel:int = 5
     __decel:int = 5
+    __hasReachedDp = False
     def __init__(self, x, y, size, dir, state, img, screenW, screenH):
         self.setSize(size)
         self.setX(x)
@@ -32,12 +33,7 @@ class Agent:
     def renderAgent(self, screen:Surface, mp0, mp1):
         resizedImage = pygame.transform.scale(self.__img, (self.__size, self.__size))
         rotatedImage = pygame.transform.rotate(resizedImage, self.__dir)
-        #cellRect = pygame.Rect(self.__x, self.__y, self.__size, self.__size)
-        #pygame.draw.rect(screen, [255,255,255], cellRect)
-        #screen.blit(rotatedImage, (self.__x, self.__y))
         screen.blit(rotatedImage, (self.__x - int(rotatedImage.get_width() / 2), self.__y - int(rotatedImage.get_height() / 2)))
-        #print(self.__bx, self.__by)
-
 
 
 
@@ -87,6 +83,14 @@ class Agent:
     def getSize(self):
         return self.__size
 
+    def resetVelocity(self):
+        self.__velocity = self.__velocity * 0
+
+    def setAccel(self, a):
+        self.__accel = a
+
+    def resetHasReachedDp(self):
+        self.__hasReachedDp = False
 
 
     def setState(self, state):
@@ -110,22 +114,57 @@ class Agent:
     def setImage(self, path:str):
         self.__img = pygame.image.load(path)
 
-    def seekMove(self, dist, dir, screenW, screenH, dt):
-        #print(dir)
+    def seekMove(self, totalDist, currDist, dir, minSpeed, maxSpeed, screenW, screenH, dt):
         dir.y = -dir.y
         vecPos = pygame.math.Vector2((self.getX(), self.getY()))
-        #vecPos += dir * self.getSpeed() * dt
         self.__velocity += dir * self.__accel * dt
+        self.Lerp(self.__velocity.length(), currDist, totalDist, dir, minSpeed, maxSpeed, 80)
         vecPos += self.__velocity
         self.setX(vecPos.x)
         self.setY(vecPos.y)
         self.setBoardX(self.getX(), screenW)
         self.setBoardY(self.getY(), screenH)
-        #print(self.getX(), self.getY())
-        pass
+        if currDist >= totalDist - 10:
+           self.resetVelocity()
 
-    def Lerp(self, dist, velo, maxSpeed, minSpeed):
-        pass
+    def fleeMove(self, totalDist, currDist, dir, minSpeed, maxSpeed, screenW, screenH, dt):
+        dir.y = -dir.y
+        vecPos = pygame.math.Vector2((self.getX(), self.getY()))
+        self.__velocity += dir * self.__accel * dt
+        self.Lerp(self.__velocity.length(), currDist, totalDist, dir, minSpeed, maxSpeed, 80)
+        vecPos += self.__velocity
+        self.setX(vecPos.x)
+        self.setY(vecPos.y)
+        self.setBoardX(self.getX(), screenW)
+        self.setBoardY(self.getY(), screenH)
+        print(self.__accel)
+        if totalDist - currDist >= 300:
+           self.__accel = 0
+           self.resetVelocity()
+
+
+    def Lerp(self,currSpeed, currDist, totalDist, dir, minSpeed, maxSpeed, dP):
+        decelPoint:float = (dP * totalDist) / 100
+        if currSpeed >= maxSpeed:
+            self.__accel = 0
+        if currSpeed <= minSpeed and self.__hasReachedDp:
+            self.__accel = 0
+        if currDist > decelPoint and self.__hasReachedDp == False:
+            self.__accel = -5
+            self.__hasReachedDp = True
+
+    #def setAccel(self, currDist, totalDist, accel, dP, minSpeed, maxSpee):
+    #    decelPoint:float = (dP * totalDist) / 100
+    #    if currSpeed > maxSpeed:
+    #        self.__accel = 1
+    #    if currDist >= decelPoint:
+    #        self.__accel = -accel
+    #    if currDist >= totalDist - 10:
+    #       self.__accel = accel
+    #    #print(currDist)
+    #    #print(totalDist)
+
+
 
 
 
