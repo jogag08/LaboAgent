@@ -137,11 +137,10 @@ class Agent:
         self.setY(vecPos.y)
         self.setBoardX(self.getX(), screenW)
         self.setBoardY(self.getY(), screenH)
-        print(self.__accel)
+        #print(self.__accel)
         if totalDist - currDist >= 300:
            self.__accel = 0
            self.resetVelocity()
-
 
     def Lerp(self,currSpeed, currDist, totalDist, dir, minSpeed, maxSpeed, dP):
         decelPoint:float = (dP * totalDist) / 100

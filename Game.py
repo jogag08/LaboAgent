@@ -164,8 +164,11 @@ class Game:
                 self.onFlee(self.__localBoardMousePosition[0], self.__localBoardMousePosition[1],0,0)
 
             if(self.getCbox() == "Wander"):
-                self.setLine(self.__agent.getX(), self.__agent.getY(), 100,100 )
-                self.onWander(0,0,0,0)
+                self.setLine(self.__agent.getX(), self.__agent.getY(),self.__agent.getX() + 100, self.__agent.getY() + 100)
+                self.setAngle(0, 0, 0, 0)
+                print(self.__agent.getDir())
+                #print(self.__agent.getBoardX(), self.__agent.getBoardY())
+                #self.onWander(100,100,300, 300)
 
 
 
