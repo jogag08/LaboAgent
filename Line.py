@@ -6,8 +6,14 @@ from pygame import Surface
 class Line:
     __x1:int
     __y1:int
+    __bx1:int
+    __bxy1:int
     __x2:int
     __y2:int
+    __bx2:int
+    __bxy2:int
+
+
     __color:int = []
     __width:int
     def __init__(self, color, x1, y1, x2, y2, width):
@@ -35,6 +41,37 @@ class Line:
 
     def getY1(self):
         return self.__y1;
+
+
+    def setBoardX1(self, x1, screenW):
+        self.__bx1 = int(x1 - (screenW / 2))
+
+    def getBoardX1(self):
+        return self.__bx1;
+
+
+    def setBoardX2(self, x2, screenW):
+        self.__bx2 = int(x2 - (screenW / 2))
+
+    def getBoardX2(self):
+        return self.__bx2;
+
+
+    def setBoardY1(self, y1, screenH):
+        self.__by1 = int((y1 * -1) + (screenH / 2))
+
+    def getBoardY1(self):
+        return self.__by1;
+
+
+    def setBoardY2(self, y2, screenH):
+        self.__by2 = int((y2 * -1) + (screenH / 2))
+
+    def getBoardY2(self):
+        return self.__by2;
+
+
+
 
 
 

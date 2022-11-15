@@ -18,6 +18,7 @@ class Game:
     __mousePosition:int = [400,400]
     __boardMousePosition:int = [0,0]
     __localBoardMousePosition:int = [0,0]
+    __localBoardLineX2Y2Position:int = [0,0]
     __distAgentFromOrigin:int = [0,0]
     __screenColor:int = [25,65,145]
     __screenW:int = 800
@@ -77,13 +78,24 @@ class Game:
         self.__localBoardMousePosition[1] = self.__boardMousePosition[1] - self.__distAgentFromOrigin[1]
 
 
+    def setLocalLineXYPosition(self):
+        self.__localBoardLineX2Y2Position[0] = self.__line.getBoardX2() - self.__distAgentFromOrigin[0]
+        self.__localBoardLineX2Y2Position[1] = self.__line.getBoardY2() - self.__distAgentFromOrigin[1]
+
+
         #Le setline utilise les positions 0 à 800 de ma window
-    def setLine(self, x1, y1, x2, y2):
+    def setLine(self, x1, y1, x2, y2, screenW, screenH):
         self.screen.fill(self.__screenColor)
         self.__line.setX1(x1)
         self.__line.setY1(y1)
         self.__line.setX2(x2)
         self.__line.setY2(y2)
+        self.__line.setBoardX1(x1, screenW)
+        self.__line.setBoardY1(y1, screenH)
+        self.__line.setBoardX2(x2, screenW)
+        self.__line.setBoardY2(y2, screenH)
+        self.setLocalLineXYPosition()
+        #print(self.__localBoardLineX2Y2Position)
         self.__line.setColor([255,0,0])
 
     def setAngle(self, x1, y1, x2, y2):
@@ -94,18 +106,32 @@ class Game:
             degAngle = radAngle * (180/math.pi)
             self.setAngleIn360(degAngle)
 
+    #def setAngleIn360(self, degAngle):
+    #    if (self.__localBoardMousePosition[0] > 0 and self.__localBoardMousePosition[1] > 0): #QUADRAN 1
+    #        pass
+    #    if (self.__localBoardMousePosition[0] > 0 and self.__localBoardMousePosition[1] < 0): #QUADRAN 2
+    #        degAngle += 360
+    #    if (self.__localBoardMousePosition[0] < 0 and self.__localBoardMousePosition[1] < 0): #QUADRAN 3
+    #        degAngle += 180
+    #    if (self.__localBoardMousePosition[0] < 0 and self.__localBoardMousePosition[1] > 0): #QUADRAN 4
+    #        degAngle += 180
+    #    if (degAngle == -0.0):
+    #        degAngle = 180.0
+    #    self.__agent.setDir(degAngle)
+
     def setAngleIn360(self, degAngle):
-        if (self.__localBoardMousePosition[0] > 0 and self.__localBoardMousePosition[1] > 0): #QUADRAN 1
+        if (self.__localBoardLineX2Y2Position[0] > 0 and self.__localBoardLineX2Y2Position[1] > 0): #QUADRAN 1
             pass
-        if (self.__localBoardMousePosition[0] > 0 and self.__localBoardMousePosition[1] < 0): #QUADRAN 2
+        if (self.__localBoardLineX2Y2Position[0] > 0 and self.__localBoardLineX2Y2Position[1] < 0): #QUADRAN 2
             degAngle += 360
-        if (self.__localBoardMousePosition[0] < 0 and self.__localBoardMousePosition[1] < 0): #QUADRAN 3
+        if (self.__localBoardLineX2Y2Position[0] < 0 and self.__localBoardLineX2Y2Position[1] < 0): #QUADRAN 3
             degAngle += 180
-        if (self.__localBoardMousePosition[0] < 0 and self.__localBoardMousePosition[1] > 0): #QUADRAN 4
+        if (self.__localBoardLineX2Y2Position[0] < 0 and self.__localBoardLineX2Y2Position[1] > 0): #QUADRAN 4
             degAngle += 180
         if (degAngle == -0.0):
             degAngle = 180.0
         self.__agent.setDir(degAngle)
+        print(degAngle)
 
     def setCbox(self, currState):
         self.__cbox = currState
@@ -117,58 +143,70 @@ class Game:
         dist:int = [0,0]
         dist[0] = x2 - x1
         dist[1] = y2 - y1
-        vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
-        vecDirNorm = pygame.math.Vector2(vecDir).normalize()
-        currDist = vecDir.length() - self.__vecLen
-        self.__agent.seekMove(vecDir.length(), currDist, vecDirNorm, 1, 3, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
+        if dist != [0,0]:
+            vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
+            vecDirNorm = pygame.math.Vector2(vecDir).normalize()
+            currDist = vecDir.length() - self.__vecLen
+            self.__agent.seekMove(vecDir.length(), currDist, vecDirNorm, 1, 3, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
 
     def onFlee(self, x1, y1, x2, y2):
         dist:int = [0,0]
         dist[0] = x2 - x1
         dist[1] = y2 - y1
-        vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
-        vecDirNorm = pygame.math.Vector2(vecDir).normalize()
-        currDist = vecDir.length() - self.__vecLen
-        self.__agent.fleeMove(vecDir.length(), currDist, vecDirNorm, 1, 3, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
+        if dist != [0,0]:
+            vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
+            vecDirNorm = pygame.math.Vector2(vecDir).normalize()
+            currDist = vecDir.length() - self.__vecLen
+            self.__agent.fleeMove(vecDir.length(), currDist, vecDirNorm, 1, 3, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
 
     def onWander(self, x1, y1, x2, y2):
-        dist:int = [0,0]
-        dist[0] = x2 - x1
-        dist[1] = y2 - y1
-        vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
-        print(vecDir)
-        #self.__agent.setDir(self.__agent.getDir() + 1)
-        #ajouter un vecteur à la pos du joueur
+        print(self.__agent.getIsMoving())
+        if self.__agent.getIsMoving() == False:
+            dist:int = [0,0]
+            dist[0] = x2 - x1
+            dist[1] = y2 - y1
+            if dist != [0,0]:
+                vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
+                vecDirNorm = pygame.math.Vector2(vecDir).normalize()
+                currDist = vecDir.length() - self.__vecLen
+                self.__agent.wanderMove(vecDir.length(), currDist, vecDirNorm, 1, 3, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
 
 
     def onClick(self):
-        self.setMousePosition()
-        self.setBoardMousePosition(self.__mousePosition[0], self.__mousePosition[1])
-        self.setDistanceAgentFromOrigin()
-        self.setLocalBoardMousePosition()
-        self.__agent.resetVelocity()
-        self.__agent.setAccel(5)
-        self.__agent.resetHasReachedDp()
+        if self.getCbox() != "Wander":
+            self.setMousePosition()
+            self.setBoardMousePosition(self.__mousePosition[0], self.__mousePosition[1])
+            self.setDistanceAgentFromOrigin()
+            self.setLocalBoardMousePosition()
+            self.__agent.resetVelocity()
+            self.__agent.setAccel(5)
+            self.__agent.resetHasReachedDp()
+        elif self.getCbox() != "Wander":
+            self.setLocalBoardMousePosition()
+
 
     def agentMove(self):
         self.setVecLen(self.__agent.getBoardX(), self.__agent.getBoardY(), self.__boardMousePosition[0], self.__boardMousePosition[1])
         if (self.__boardMousePosition[0] != 0) and (self.__boardMousePosition[1] != 0):
             if(self.getCbox() == "Seek"):
-                self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
+                self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1], self.__screenW, self.__screenH)
                 self.setAngle(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
                 self.onSeek(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
 
             if(self.getCbox() == "Flee"):
-                self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1])
+                self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1], self.__screenW, self.__screenH)
                 self.setAngle(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
                 self.onFlee(self.__localBoardMousePosition[0], self.__localBoardMousePosition[1],0,0)
 
             if(self.getCbox() == "Wander"):
-                self.setLine(self.__agent.getX(), self.__agent.getY(),self.__agent.getX() + 100, self.__agent.getY() + 100)
-                self.setAngle(0, 0, 0, 0)
-                print(self.__agent.getDir())
-                #print(self.__agent.getBoardX(), self.__agent.getBoardY())
-                #self.onWander(100,100,300, 300)
+                if self.__agent.getIsMoving() == False:
+                    self.__agent.resetVelocity()
+                    self.__agent.setAccel(5)
+                self.setLine(self.__agent.getX(), self.__agent.getY(),self.__agent.getX() + 100, self.__agent.getY() + 100, self.__screenW, self.__screenH)
+                self.setAngle(0, 0, self.__localBoardLineX2Y2Position[0], self.__localBoardLineX2Y2Position[1])
+                self.onWander(0, 0, self.__localBoardLineX2Y2Position[0], self.__localBoardLineX2Y2Position[1])
+                    #print(self.__agent.getDir())
+
 
 
 
@@ -184,6 +222,7 @@ class Game:
 
 
     def TEST(self):
+        #print(self.__agent.getState())
         #print(self.__mousePosition)
         #print(self.__agent.getBoardX(), self.__agent.getBoardY())
         #self.setDistanceAgentFromOrigin()

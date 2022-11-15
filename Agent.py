@@ -20,6 +20,7 @@ class Agent:
     __accel:int = 5
     __decel:int = 5
     __hasReachedDp = False
+    __isMoving = False
     def __init__(self, x, y, size, dir, state, img, screenW, screenH):
         self.setSize(size)
         self.setX(x)
@@ -85,6 +86,13 @@ class Agent:
 
     def resetVelocity(self):
         self.__velocity = self.__velocity * 0
+        self.setIsMoving(True)
+
+    def setIsMoving(self, b):
+        self.__isMoving = b
+
+    def getIsMoving(self):
+        return self.__isMoving
 
     def setAccel(self, a):
         self.__accel = a
@@ -142,6 +150,19 @@ class Agent:
            self.__accel = 0
            self.resetVelocity()
 
+    def wanderMove(self, totalDist, currDist, dir, minSpeed, maxSpeed, screenW, screenH, dt):
+        dir.y = -dir.y
+        vecPos = pygame.math.Vector2((self.getX(), self.getY()))
+        self.__velocity += dir * self.__accel * dt
+        self.Lerp(self.__velocity.length(), currDist, totalDist, dir, minSpeed, maxSpeed, 80)
+        vecPos += self.__velocity
+        self.setX(vecPos.x)
+        self.setY(vecPos.y)
+        self.setBoardX(self.getX(), screenW)
+        self.setBoardY(self.getY(), screenH)
+        if currDist >= totalDist - 10:
+           self.resetVelocity()
+
     def Lerp(self,currSpeed, currDist, totalDist, dir, minSpeed, maxSpeed, dP):
         decelPoint:float = (dP * totalDist) / 100
         if currSpeed >= maxSpeed:
@@ -151,17 +172,6 @@ class Agent:
         if currDist > decelPoint and self.__hasReachedDp == False:
             self.__accel = -5
             self.__hasReachedDp = True
-
-    #def setAccel(self, currDist, totalDist, accel, dP, minSpeed, maxSpee):
-    #    decelPoint:float = (dP * totalDist) / 100
-    #    if currSpeed > maxSpeed:
-    #        self.__accel = 1
-    #    if currDist >= decelPoint:
-    #        self.__accel = -accel
-    #    if currDist >= totalDist - 10:
-    #       self.__accel = accel
-    #    #print(currDist)
-    #    #print(totalDist)
 
 
 
