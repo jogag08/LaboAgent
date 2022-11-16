@@ -86,7 +86,6 @@ class Agent:
 
     def resetVelocity(self):
         self.__velocity = self.__velocity * 0
-        self.setIsMoving(True)
 
     def setIsMoving(self, b):
         self.__isMoving = b
@@ -160,7 +159,9 @@ class Agent:
         self.setY(vecPos.y)
         self.setBoardX(self.getX(), screenW)
         self.setBoardY(self.getY(), screenH)
+        #print(currDist, totalDist)
         if currDist >= totalDist - 10:
+           self.setIsMoving(False)
            self.resetVelocity()
 
     def Lerp(self,currSpeed, currDist, totalDist, dir, minSpeed, maxSpeed, dP):

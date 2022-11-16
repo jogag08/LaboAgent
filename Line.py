@@ -12,8 +12,6 @@ class Line:
     __y2:int
     __bx2:int
     __bxy2:int
-
-
     __color:int = []
     __width:int
     def __init__(self, color, x1, y1, x2, y2, width):

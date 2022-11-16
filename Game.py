@@ -1,6 +1,7 @@
 # This Python file uses the following encoding: utf-8
 import pygame
 import math
+import random
 
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton
 from PySide6.QtCore import QTimer
@@ -25,6 +26,8 @@ class Game:
     __screenH:int = 800
     __cbox:str = "Seek"
     __vecLen:float
+    __rdmX:int
+    __rdmX:int
     def __init__(self):
         pygame.init()
         self.timer = Timer()
@@ -81,6 +84,8 @@ class Game:
     def setLocalLineXYPosition(self):
         self.__localBoardLineX2Y2Position[0] = self.__line.getBoardX2() - self.__distAgentFromOrigin[0]
         self.__localBoardLineX2Y2Position[1] = self.__line.getBoardY2() - self.__distAgentFromOrigin[1]
+        #print('x',self.__localBoardLineX2Y2Position[0])
+        #print('y',self.__localBoardLineX2Y2Position[1])
 
 
         #Le setline utilise les positions 0 à 800 de ma window
@@ -131,7 +136,7 @@ class Game:
         if (degAngle == -0.0):
             degAngle = 180.0
         self.__agent.setDir(degAngle)
-        print(degAngle)
+        #print(degAngle)
 
     def setCbox(self, currState):
         self.__cbox = currState
@@ -160,52 +165,58 @@ class Game:
             self.__agent.fleeMove(vecDir.length(), currDist, vecDirNorm, 1, 3, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
 
     def onWander(self, x1, y1, x2, y2):
-        print(self.__agent.getIsMoving())
-        if self.__agent.getIsMoving() == False:
-            dist:int = [0,0]
-            dist[0] = x2 - x1
-            dist[1] = y2 - y1
-            if dist != [0,0]:
-                vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
-                vecDirNorm = pygame.math.Vector2(vecDir).normalize()
-                currDist = vecDir.length() - self.__vecLen
-                self.__agent.wanderMove(vecDir.length(), currDist, vecDirNorm, 1, 3, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
+        dist:int = [0,0]
+        dist[0] = x2 - x1
+        dist[1] = y2 - y1
+        if dist != [0,0]:
+            vecDir:pygame.math.Vector2 = pygame.math.Vector2(dist)
+            vecDirNorm = pygame.math.Vector2(vecDir).normalize()
+            print(vecDir.length())
+            print(self.__vecLen)
+            currDist =  vecDir.length() - self.__vecLen
+            self.__agent.wanderMove(vecDir.length(), currDist, vecDirNorm, 1, 3, self.__screenW, self.__screenH, self.__timer.get_deltaTime())
 
 
     def onClick(self):
-        if self.getCbox() != "Wander":
-            self.setMousePosition()
-            self.setBoardMousePosition(self.__mousePosition[0], self.__mousePosition[1])
-            self.setDistanceAgentFromOrigin()
-            self.setLocalBoardMousePosition()
-            self.__agent.resetVelocity()
-            self.__agent.setAccel(5)
-            self.__agent.resetHasReachedDp()
-        elif self.getCbox() != "Wander":
-            self.setLocalBoardMousePosition()
+        self.setMousePosition()
+        self.setBoardMousePosition(self.__mousePosition[0], self.__mousePosition[1])
+        #self.setDistanceAgentFromOrigin()
+        self.setLocalBoardMousePosition()
+        self.__agent.resetVelocity()
+        self.__agent.setAccel(5)
+        self.__agent.resetHasReachedDp()
 
 
     def agentMove(self):
-        self.setVecLen(self.__agent.getBoardX(), self.__agent.getBoardY(), self.__boardMousePosition[0], self.__boardMousePosition[1])
+        self.setDistanceAgentFromOrigin()
         if (self.__boardMousePosition[0] != 0) and (self.__boardMousePosition[1] != 0):
             if(self.getCbox() == "Seek"):
+                self.__agent.setIsMoving(False)
+                self.setVecLen(self.__agent.getBoardX(), self.__agent.getBoardY(), self.__boardMousePosition[0], self.__boardMousePosition[1])
                 self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1], self.__screenW, self.__screenH)
                 self.setAngle(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
                 self.onSeek(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
 
             if(self.getCbox() == "Flee"):
+                self.__agent.setIsMoving(False)
+                self.setVecLen(self.__agent.getBoardX(), self.__agent.getBoardY(), self.__boardMousePosition[0], self.__boardMousePosition[1])
                 self.setLine(self.__agent.getX(), self.__agent.getY(), self.__mousePosition[0], self.__mousePosition[1], self.__screenW, self.__screenH)
                 self.setAngle(0, 0, self.__localBoardMousePosition[0], self.__localBoardMousePosition[1])
                 self.onFlee(self.__localBoardMousePosition[0], self.__localBoardMousePosition[1],0,0)
 
-            if(self.getCbox() == "Wander"):
-                if self.__agent.getIsMoving() == False:
-                    self.__agent.resetVelocity()
-                    self.__agent.setAccel(5)
-                self.setLine(self.__agent.getX(), self.__agent.getY(),self.__agent.getX() + 100, self.__agent.getY() + 100, self.__screenW, self.__screenH)
+        if(self.getCbox() == "Wander"):
+            if self.__agent.getIsMoving() == False:
+                self.__rdmX = random.randrange(0,800)
+                self.__rdmY = random.randrange(0,800)
+                self.setVecLen(self.__agent.getBoardX(), self.__agent.getBoardY(), self.__localBoardLineX2Y2Position[0], self.__localBoardLineX2Y2Position[1])
+                self.setLine(self.__agent.getX(), self.__agent.getY(), self.__rdmX, self.__rdmY, self.__screenW, self.__screenH)
                 self.setAngle(0, 0, self.__localBoardLineX2Y2Position[0], self.__localBoardLineX2Y2Position[1])
+                self.__agent.setIsMoving(True)
+            if self.__agent.getIsMoving() == True:
+                #self.setVecLen(self.__agent.getBoardX(), self.__agent.getBoardY(), self.__localBoardLineX2Y2Position[0], self.__localBoardLineX2Y2Position[1])
+                self.setLine(self.__agent.getX(), self.__agent.getY(), self.__rdmX, self.__rdmY, self.__screenW, self.__screenH)
                 self.onWander(0, 0, self.__localBoardLineX2Y2Position[0], self.__localBoardLineX2Y2Position[1])
-                    #print(self.__agent.getDir())
+            #print(self.__agent.getIsMoving())
 
 
 
@@ -216,6 +227,9 @@ class Game:
         dist[1] = y2 - y1
         self.__vecLen = int(pygame.math.Vector2(dist).length())
         #print(pygame.math.Vector2(dist))
+
+    #def generateNextMove(self):
+    #    random.randrange(100,800)
 
 
 
